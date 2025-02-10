@@ -4,7 +4,6 @@ from fpdf import FPDF
 import io
 
 def generate_pdf(name, products, grand_total):
-    """Generates a PDF invoice with the given name and product details."""
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -31,7 +30,7 @@ def generate_pdf(name, products, grand_total):
         pdf.cell(50, 10, product_name, 1)
         pdf.cell(50, 10, weight, 1)
         pdf.cell(40, 10, f"{price:.2f}", 1)
-        pdf.cell(40, 10, f"{price:.2f}", 1)  # Here, price is used as the row total.
+        pdf.cell(40, 10, f"{price:.2f}", 1)  # Using price as the row total.
         pdf.ln()
     
     # Grand total row
@@ -40,10 +39,16 @@ def generate_pdf(name, products, grand_total):
     pdf.cell(40, 10, f"{grand_total:.2f}", 1)
     pdf.ln()
     
-    # Save the PDF into an in-memory bytes buffer
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    return pdf_buffer.getvalue()
+    # Get PDF output as a string or bytearray
+    pdf_output = pdf.output(dest="S")
+    
+    # Convert the result to bytes:
+    if isinstance(pdf_output, str):
+        return pdf_output.encode("latin1")
+    else:
+        # If it's a bytearray, convert it to bytes
+        return bytes(pdf_output)
+
 
 # Initialize session state for storing product entries.
 if 'products' not in st.session_state:
